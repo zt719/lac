@@ -1,0 +1,151 @@
+Languages and Computation -- Tutorial 6
+
+1. Context Free Grammar:
+   ∙ Nonterminal Symbols (NT) : A , B , C , S , T , F ..
+   ∙ Terminal Symbols (T): a , b , c , ... 0 ,  1, ( , )
+   ∙ Production Relation (P/→):
+     P ⊆ N × (N ⊕ T)*
+
+       * S → S1 | S0
+
+   ∙  S ∈ N
+
+2. Semantic of CFG:
+
+  Given a G ∈ CFG
+  What is L(G) ?
+
+  Define ⇒
+  ⇒ ⊆ (N ⊕ T)* × (N ⊕ T)*
+  ⇒* ⊆ (N ⊕ T)* × (N ⊕ T)*
+
+  L(G) = { w ∈ T* | S ⇒* w }
+
+
+2. Deriviation Tree:
+
+E → T | E + T
+T → F | T * F
+F → a | (E)
+
+E lm⇒ E + T
+  lm⇒ T + T
+  lm⇒ F + T
+  lm⇒ a + T
+  lm⇒ a + F
+  lm⇒ a + ( E )
+  lm⇒ a + ( T )
+  lm⇒ a + ( T * F )
+  lm⇒ a + ( F * F )
+  lm⇒ a + ( a * F )
+  lm⇒ a + ( a * a )
+
+4. Ambiguation:
+
+E → E + E
+  | E * E
+  | (E)
+  | I
+I → DI | D
+D → 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+E ⇒ E + E
+  ⇒ 1 + E
+  ⇒ 1 + E * E
+  ⇒ 1 + 2 * 3
+
+4. Disambiguating:
+
+E → ( E + E )
+  | ( E * E )
+  | I
+I → DI | D
+D → 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+E ⇒ ( E + E )
+  ⇒ ( 1 + E )
+  ⇒ ( 1 + ( E * E ) )
+  ⇒ ( 1 + ( 2 * E ) )
+  ⇒ ( 1 + ( 2 * 3 ) )  
+
+5. Precedence and Associativity:
+
+G₀ :
+E → E + E | E * E | E ↑ E | (E) | N
+N → 0 | 1 | 2
+
+What is Precedence:
+
+P(↑) > P(*) > P(+)
+
+w = 1 + 2 * 2 ↑ 2 ↑ 2 + 0
+read as ((1 + (2 * (2 ↑ (2 ↑ 2)))) + 0)
+
+What is Associativity:
+
+w = 1 + 2 + 3 + 4
+read as (((1 + 2) + 3) + 4)   # left
+or as (1 + (2 + (3 + 4)))     # right
+
+How to add precedence:
+
+G₀ :
+E → E + E | E * E | E ↑ E | (E) | N
+N → 0 | 1 | 2
+
+G₁ :
+E  → E₁ + E₁ | E₁   # E only takes care of + or just E₁
+E₁ → E₂ * E₂ | E₂   # E only takes care of * or just E₂
+E₂ → E₃ ↑ E₃ | E₃   # E only takes care of ↑ or just E₃
+E₃ → N | ( E )
+N → 0 | 1 | 2
+
+w = 1 + 2 * 3
+E ⇒ E₁ + E₁
+  ⇒ E₂ + E₁
+  ⇒ E₃ + E₁
+  ⇒ N + E₁
+  ⇒ 1 + E₁
+  ⇒ 1 + E₂ * E₂
+  ⇒ 1 + E₃ * E₂
+  ⇒ 1 + N * E₂
+  ⇒ 1 + 2 * E₂
+  ⇒ 1 + 2 * E₃
+  ⇒ 1 + 2 * N
+  ⇒ 1 + 2 * 3
+
+w = ( 1 + 2 ) * 3
+E ⇒ ...
+
+How to add associativity:
+
+(+) # left 
+(*) # left
+(↑) # right
+
+w = 1 ↑ 2 ↑ 3
+read as 1 ↑ (2 ↑ 3)
+
+G₁ = 
+E  → E + N | N
+N → 0 | 1 | 2
+
+1 + 2 + 3 + 4
+E ⇒ E + N
+  ⇒ E + N + N
+  ⇒ E + N + N + N
+  ⇒ N + N + N + N
+  ⇒ 1 + 2 + 3 + 4
+
+
+-------
+
+G₂ :
+E  → E + E₁ | E₁      # + is left-assoc
+E₁ → E₁ * E₂ | E₂     # * is left-assoc
+E₂ → E₃ ↑ E₂ | E₃     # ↑ is right-assoc
+E₃ → N | ( E )        # The only necessary brackets
+N  → 0 | 1 | 2
+
+w = 1 + 2 * 2 ↑ 2 ↑ 2 + 0
+E ⇒ ...

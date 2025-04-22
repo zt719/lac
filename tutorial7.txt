@@ -1,0 +1,164 @@
+Languages and Computation -- Tutorial 7
+
+1. PDA definition:
+
+  DFA A = (Q, Σ, δ, q₀, F):
+  ∙ A finite set of states Q
+  ∙ A finite set of input symbols, the alphabet, Σ
+  ∙ A transition function δ ∈ Q × Σ → Q
+  ∙ An initial state q0 ∈ Q
+  ∙ A set of final states F ⊆ Q
+
+  PDA P = (Q, Σ, Γ, δ, q₀, Z₀, F):
+  • A finite set Q of states,
+  • A finite set Σ of input symbols
+  • A finite set Γ of stack symbols
+  • A transition function δ ∈ Q × (Σ ∪ {ε}) × Γ → Pfin(Q × Γ*)
+  • An initial state q₀ ∈ Q
+  • An initial stack symbol Z₀ ∈ Γ
+  • A set of final states F ⊆ Q
+
+  PDA = DFA + Stack + Undeterminism
+
+  Example L = { aⁿbⁿ | n ≥ 0 }:
+
+  Define PDA P = (Q, Σ, Γ, δ, q₀, Z₀, F )
+    where
+  Q = {q₀, q₁, q₂}
+  Σ = {a, b}
+  Γ = {a, b, #}
+  δ = δ
+  q₀ = q₀
+  Z₀ = #
+  F = {q₂}
+  
+  δ(q₀, a, z) = {(q₀, az)}
+  δ(q₀, ε, z) = {(q₁, z)}
+  δ(q₁, b, a) = {(q₁, ε)}
+  δ(q₁, ε, #) = {(q₂, ε)}
+  δ(q,  x, z) = ∅
+
+    a, z, az           b, a, ε
+      ↑  ↓   ε, z, z    ↑  ↓    ε, #, ε
+  -→ ( q₀ ) ---------→ ( q₁ ) ----------→ (( q₂ ))
+
+2. Instantaneous Description (ID):
+
+  A state of PDA computation:
+  • current state q ∈ Q
+  • remaning w ∈ Σ*
+  • current stack γ ∈ Γ*
+
+  (q, w, γ) ∈ ID
+
+  Define derivation (⊢ ⊆ ID × ID) as a binary relation of ID:
+
+  1. (q, xw, zγ) ⊢ (q′, w, αγ) if (q′, α) ∈ δ(q, x, z)
+  2. (q, w, zγ)  ⊢ (q′, w, αγ) if (q′, α) ∈ δ(q, ε, z)
+
+  \|- = ⊢
+
+  Example:
+
+  δ(q₀, a, z) = {(q₀, az)}
+  δ(q₀, ε, z) = {(q₁, z)}
+  δ(q₁, b, a) = {(q₁, ε)}
+  δ(q₁, ε, #) = {(q₂, ε)}
+  δ(q,  x, z) = ∅
+
+  A succesful derivation of 'aabb'
+  (q₀, aabb, #)
+  ⊢ (q₀, abb, a#)      (q₀, a#) ∈ δ(q₀, a, #)
+  ⊢ (q₀, bb, aa#)      (q₀, aa) ∈ δ(q₀, a, a)
+  ⊢ (q₁, bb, aa#)      (q₁, a)  ∈ δ(q₀, ε, a)
+  ⊢ (q₁, b, a#)        (q₁, ε)  ∈ δ(q₁, b, a)
+  ⊢ (q₁, ε, #)         (q₁, ε)  ∈ δ(q₁, b, a)
+  ⊢ (q₂, ε, ε)         (q₂, ε)  ∈ δ(q₁, ε, #)
+
+  A failed derivation of 'aabb'
+  ...
+
+3. The language of PDA
+
+  1. Acceptance by final states
+
+  2. Acceptance by empty stack
+
+4. DPDA:
+
+  A PDA is deterministic iff there are no choice under every ID:
+  
+    | δ(q, x , z) + δ(q, ε, z) | ≤ 1
+
+
+  Example: Is PDA A aⁿbⁿ deterministic?
+
+  No because:
+
+    ∣ δ(q₀, a, z) + δ(q₀, ε, z) | = {(q₀, az), (q₁, z)} > 1
+
+
+  But we can define DPDA P = (Q, Σ, Γ, δ, q₀, Z₀, F )
+    where
+  Q = {q₀, q₁, q₂}
+  Σ = {a, b}
+  Γ = {a, b, #}
+  δ = δ
+  q₀ = q₀
+  Z₀ = #
+  F = {q₂}
+  
+  δ(q₀, a, z) = {(q₀, az)}
+  δ(q₀, b, a) = {(q₁, ε)}
+  δ(q₁, b, a) = {(q₁, ε)}
+  δ(q₁, ε, #) = {(q₂, ε)}
+  δ(q,  x, z) = ∅
+
+    a, z, az           b, a, ε
+      ↑  ↓   b, a, ε    ↑  ↓    ε, #, ε
+  -→ ( q₀ ) ---------→ ( q₁ ) ----------→ (( q₂ ))
+
+  Is there an algorithm turns PDA to DPDA?
+
+  No because NPDAs are more powerful than DPDAs.
+
+  L = { wwʳ } can be only defined in NPDA.
+
+5. CFG → PDA:
+
+  Given a CFG G = {NT, T, P, S}
+  We define P(G) = ({q₀}, NT, T ⊎ NT, δ, q₀, S)
+    where
+  δ(q₀, ε, A) = {(q₀, α) | A → α ∈ P }  for all A ∈ NT
+  δ(q₀, a, a) = {(q₀, ε)}               for all a ∈ T
+
+  We always choose acceptance by empty stack
+  
+  Example:
+  
+  Given CFG G = {NT, T, P, S}
+    where
+  NT = {S}
+  T = {a, b}
+  P = S → ε | aSb
+  S = S
+
+  We define P(G) = ({q₀}, NT , T ⊎ NT, δ, q₀ , S)
+    where
+  δ(q₀, ε , S) = {(q₀, ε), (q₀, aSb)}
+  δ(q₀, a , a) = {(q₀, ε)}
+  δ(q₀, b , b) = {(q₀, ε)}
+
+  A succesful derivation of 'aabb'
+  (q₀, aabb, S)
+  ⊢ (q₀, aabb, aSb)
+  ⊢ (q₀, abb, Sb)
+  ⊢ (q₀, abb, aSbb)
+  ⊢ (q₀, bb, Sbb)
+  ⊢ (q₀, bb, bb)
+  ⊢ (q₀, b, b)
+  ⊢ (q₀, ε, ε)
+
+  A failed derivation of 'aabb'
+  (q₀, aabb, S)
+  ⊢ (q₀, aabb, ε)  stuck

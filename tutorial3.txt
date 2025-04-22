@@ -1,0 +1,28 @@
+Languages and Computation -- Tutorial 3
+
+This week:
+
+1. Regular Expression + Def ?
+  1. {}  ∅
+  2. ε
+  3. {x | x ∈ Σ}
+  4. E F are RE → (E · F)
+  5. E F are RE → (E + F)
+  6. E is RE → E *
+
+
+
+2. Algebraic Laws
+  A B C are RE :
+  1. (A + B) · C == (A · C) + (B · C)
+  2. A + (B · C) == (A + B) · (A + C) ?
+
+  A                 A · A
+
+
+3. RE → NFA
+4. NFA → DFA
+5. DFA (NFA) → RE :
+  1. Intuition:
+  2. State Elimination Methods:
+

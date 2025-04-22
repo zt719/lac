@@ -1,0 +1,28 @@
+Languages and Computation -- Tutorial 1
+
+Sigma = { a , b , c} 
+
+L1 = { w | w.length <= 2 }
+     = { “a” , “b” , “c” , [] , “ab”, “ac”, “bc” , “aa”, “bb”, “cc”, “ba”, “ca”, “cb”}
+
+L2 = { w | w is Palin  ^  w <= 3 }
+		= { “a”, “b”, “c” , “aa” , “bb”, “cc”, “aaa”, “bbb”, “ccc”,
+				“aba”, “aca”, “bab”, “bcb”, “cac”, “cbc”, eta }
+
+{} = phi
+eta = empty word
+{ eta} = A language contains empty word
+
+L3 = { “ab” , “a” }
+L4 = { “c” , “a” }
+L5 = { “a” , “aa” , eta }
+
+(++) — Word concatenation
+( . ) — Language concatenation
+
+L3 . L4 = { “abc” , “aba”, “ac” , “aa” }
+L4 . L3 = { “ca” , “cab” , “cab” , “aa” }
+L3 `union` L4 = { “ab” , “a” , “c” }
+L3 `intersect` L4 = { “a” }
+
+| L | = the number of elements in L

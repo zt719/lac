@@ -1,0 +1,90 @@
+Languages and Computation -- Tutorial 8
+
+1. Turing Machines
+
+  A Turing machine M = (Q, Σ, Γ, δ, q₀, B, F ) is:
+  • A finite set Q of states
+  • A finite set Σ of symbols (the alphabet)
+  • A finite set Γ of tape symbols s.t. Σ ⊆ Γ
+  • A transition function:
+    δ ∈ Q × Γ → {stop} ∪ Q × Γ × {L, R}
+  • An initial state q₀ ∈ Q
+  • The blank symbol B ∈ Γ 
+  • A set of final states F ⊆ Q
+
+  * TM ≈ PDA with two tapes
+  
+  * We can define nondeterministic TM where the transition function goes to multiple next state: 
+       δ ∈ Q × Γ → 𝐏 (Q × Γ × {L, R})
+    but TM ≅ NTM
+
+2. Instantaneous Description:
+
+  ...
+
+3. The language of TM:
+
+  Stuck:
+    If there is no next ID available.
+
+  Halts:
+    Runs into F or Stuck (or 'stop')
+
+  Loops:
+    not halts
+
+  Accepts:
+    Runs into (or 'stop') F
+    L(M) = { w ∈ Σ* | (ε, q₀, w) *⊢ M (γL, q′, γR) ∧ q′ ∈ F }
+
+    * for w ∈ L, it runs into F (or 'stop' on F)
+    * for w ∉ L, it may loop forever 
+
+  Decides:
+    Accepts L and always halts for w ∉ L
+    
+    * It always halts
+
+4. Theories
+
+  ...
+
+
+5. Example1 - anbncn
+
+  L = { aⁿbⁿcⁿ | n ∈ ℕ }
+
+  https://turingmachine.io/
+ 
+input: 'aabbcc'
+blank: ' '
+start state: q0
+table:
+
+  q0:
+    ' ' : {R: q6}
+    a:   {write: X, R: q1}
+  q1:
+    a: {R: q1}
+    b: {write: Y, R: q2}
+    Y: {R: q1}
+  q2:
+    b: {R: q2}
+    c: {write: Z, R: q3}
+    Z: {R: q2}
+  q3:
+    ' ': {L: q5}
+    c: {L: q4}
+  q4:
+    a: {L: q4}
+    b: {L: q4}
+    X: {R: q0}
+    Y: {L: q4}
+    Z: {L: q4}
+  q5:
+    X: {L: q6}
+    Y: {L: q5}
+    Z: {L: q5}
+  q6: 
+
+6. Example2 - Palindrone

@@ -1,0 +1,270 @@
+Languages and Computation -- Tutorial 5
+
+Today - Pumping Lemma
+
+--------------------------------------------------------
+
+1. Formal Statement:
+
+In English:
+
+For all regular language L
+, there exists an interger p ≥ 1
+, such that for all word w that is at least p length long
+, w can be split into tree substrings xyz
+, satisfying the following conditions:
+(1) y is not empty
+(2) length of xy is less or equal than p
+(3) y can be 'pumped' arbitary k times with xyᵏz is still in the language L
+
+
+In formal logic (or in lean):
+
+def pump : Word Sigma → ℕ → Word Sigma
+| w , 0 => []
+| w , (succ n) => w ++ pump w n
+
+axiom pumpingLemma :
+  ∀ A : dfa.DFA Sigma ,
+  ∃ p : ℕ ,
+  ∀ w : Word Sigma, w ∈ dfa.L A → w.length ≥ p →
+  ∃ x y z : Word Sigma, w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A
+
+axiom pumpingLemma :
+  ∀ A : dfa.DFA Sigma ,
+  ∃ p : ℕ ,
+  ∀ w : Word Sigma, w ∈ dfa.L A ∧ w.length ≥ p →
+  ∃ x y z : Word Sigma, w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A
+
+∀ L ∈ Σ* . isRegular L → Pumpable L
+
+∀ L ∈ Σ* . ¬ (Pumpable L) → ¬ (isRegular L)
+
+¬ (Pumpable L)
+:=
+  ¬ (∃ p : ℕ ,
+  ∀ w : Word Sigma,
+  w ∈ dfa.L A ∧ w.length ≥ p →
+  ∃ x y z : Word Sigma,
+  w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇔ ∀ p : ℕ,
+  ¬ (∀ w : Word Sigma, w ∈ dfa.L A → w.length ≥ p →
+  ∃ x y z : Word Sigma, w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇔ ∀ p : ℕ,
+  ∃ w : Word Sigma,
+  ¬ (w ∈ dfa.L A ∧ w.length ≥ p →
+  ∃ x y z : Word Sigma,
+  w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇔ ∀ p : ℕ,
+  ∃ w : Word Sigma,
+  w ∈ dfa.L A ∧ w.length ≥ p ∧
+  ¬ (∃ x y z : Word Sigma,
+  w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇔ ∀ p : ℕ,
+  ∃ w : Word Sigma,
+  w ∈ dfa.L A ∧ w.length ≥ p ∧
+  ∀ x y z : Word Sigma
+  ¬ (w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇐ ∀ p : ℕ,
+  ∃ w : Word Sigma,
+  w ∈ dfa.L A ∧ w.length ≥ p ∧
+  ∀ x y z : Word Sigma,
+  w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ¬ (∀ k : ℕ, x ++ (pump y k) ++ z ∈ dfa.L A)
+
+⇔ ∀ p : ℕ,
+  ∃ w : Word Sigma,
+  w ∈ dfa.L A ∧ w.length ≥ p ∧
+  ∀ x y z : Word Sigma,
+  w = x ++ y ++ z ∧
+  x.length + y.length ≤ p ∧
+  y.length ≥ 1 ∧
+  ∃ k : ℕ, x ++ (pump y k) ++ z ∉ dfa.L A
+
+--------------------------------------------------------
+
+2. Intuitive proof:
+
+  if a regular language L is a finite set, let p ≥ the | w |, w is the longest word.
+     then there is no words longer than p, so the whole statement is true.
+     
+  if a regular language L is not finite, we want to construct a dfa A that capture this L
+     but since dfa has finite state, it implies there must be at least one loop.
+
+--------------------------------------------------------
+
+
+4. Proof by contradiction:
+
+step1:
+
+  Assume language L is regular ⇒ pumping length p exists
+  
+step2:
+
+  Choose ONE particular word w (use it as counterexample)
+  Check w ∈ L and |w| ≥ p
+  
+step3:
+
+  Construct ALL different possible splitting / arbitary splitting xyz that follows the conditions (1)(2)
+  
+step4:
+
+  Choose ONE k that makes xyᵏz ∉ L. (most math here)
+  
+step5:
+
+  Contradiction. Therefore L is not regular.
+
+--------------------------------------------------------
+
+4. Exercise₁:
+
+  L = { 0ⁿ1ⁿ | n ∈ ℕ }
+
+step1:
+
+  Assume L is regular and therefore we have p.
+  
+step2:
+
+  Choose w = 0ᵖ1ᵖ.
+  Check 0ᵖ1ᵖ ∈ L
+    and 2p ≥ p
+
+step3:
+
+  Let w = xyz that follows conditions (1)(2).
+
+  It means:
+    x = 0ᵃ
+    y = 0ᵇ , b > 0
+    z = 0ᵖ⁻ᵃ⁻ᵇ1ᵖ
+
+step4:
+
+  Choose k = 2, then
+
+  xyyz = 0ᵃ0²ᵇ0ᵖ⁻ᵃ⁻ᵇ1ᵖ
+       = 0ᵖ⁺ᵇ1ᵖ            b > 1 from (1)
+       ∉ L                 p+b > p from (1)
+
+step5:
+
+  Contradiction. Therefore L is not regular.
+
+--------------------------------------------------------
+
+5. Exercise₂:
+
+  L = { 1ⁿ | n is square }   n=x² {0 , 1 , 4 , 9 , 16 ... }
+
+step1:
+
+  Assume L is regular and therefore we have p.
+  
+step2:
+
+  Choose w = 1 ^ (p²)
+
+  Check p² is a square
+    and p² ≥ p.
+
+step3:
+
+  Let w = xyz that follows conditions (1)(2)(3)
+
+step4:
+
+  Choose k = 2, then:
+  
+  From (1)(2) we know:
+
+    1 ≤ |y| ≤ |xy| ≤ p
+
+  But |xyyz| is not square because:
+
+    p² < |xyyz| < (p+1)²
+
+  because:
+
+    p² = |xyz|
+       < |xyyz|           1 ≤ |y| from condition (1)
+       = |xyz| + |y|
+       ≤ p² + p           |xy| ≤ p , so |y| ≤ p from condition (2)
+       < p² + 2p + 1
+       = (p+1)²
+
+    xyyz ∉ L
+
+step5:
+
+  Contradiction. Therefore L is not regular.
+
+--------------------------------------------------------
+
+7. Exercise₃:
+
+  L = { w ∈ {1,0}* | w contains more 1s than 0s }
+
+step1:
+
+  Assume L is regular and therefore we have p.
+  
+step2:
+
+  Choose w = 0ᵖ1ᵖ⁺¹
+  
+  Check w contains more 1s than 0s
+    and 2p+1 ≥ p
+
+step3:
+
+  Let w = xyz that follows conditions (1)(2)
+
+  It means:
+    x = 0ᵃ
+    y = 0ᵇ , b > 0
+    z = 0ᵖ⁻ᵃ⁻ᵇ1ᵖ⁺¹
+
+step4:
+
+  Choose k = 2, then:
+
+  xyyz
+  = 0ᵃ0²ᵇ0ᵖ⁻ᵃ⁻ᵇ1ᵖ⁺¹
+  = 0ᵖ⁺ᵇ1ᵖ⁺¹
+  ∉ L                p+b ≥ p+1 from (1)
+
+step5:
+
+  Contradiction. Therefore L is not regular.

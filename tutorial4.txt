@@ -1,0 +1,60 @@
+Languages and Computation -- Tutorial 4
+
+This week:
+
+1. Regular Expression
+
+1) ∅
+2) ε
+3) x  {x ∈ Σ}
+4) M·N
+5) M+N
+6) M*
+
+2. Language of RE
+
+ L : RE → Lang
+
+1) L(∅) = ∅
+2) L(ε) = {ε}
+3) L(x) = {x}
+4) L(MN) = L(M)L(N)
+5) L(M+N) = L(M)∪L(N)
+6) L(M*)  = L(M)*
+
+Exercise 4.2:
+  (aa+εb*∅)(b+c)
+
+  L((aa+(ε(b*)∅))(b+c))
+  = L(aa+εb*∅) L(b+c)
+  = (L(aa) ∪ L(εb*∅)) (L(b) ∪ L(c))
+  = (L(a)L(a) ∪ L(εb*)L(∅)) (L(b) ∪ L(c))
+  = (({a} {a})) ({b} ∪ {c})
+  = { aab , aac }
+
+3. Automata Minimisation
+
+  a b c d e f
+a \----------
+b   \--------
+c D D \------
+d D D   \----
+e D D     \--
+f D D D D \
+
+(d,e)
+
+(a,b) -- 0 -→ (b,a) idk so carry on
+(a,b) -- 1 -→ (c,d) idk 
+
+(a,f) -- 0 -→ (b,f)
+(a,f) -- 1 -→ (c,f)
+
+(b,f) -- 0 -→ (a,f)
+(b,f) -- 1 -→ (d,f)
+
+(c,d) -- 0 -→ (e,e) N 
+(c,d) -- 1 -→ (f,f) N
+
+(c,e) -- 0 -→ (e,e) N
+(c,e) -- 1 -→ (f,f) N
